@@ -1,0 +1,20 @@
+#:kivy 1.0.9
+
+BoxLayout:
+    orientation: 'vertical'
+    Menu:
+        size_hint_y: .1
+        manager: screen_manager
+    ScreenManagement:
+        size_hint_y: .9
+        id: screen_manager
+<Menu>:
+    orientation: "vertical"
+    ActionBar:
+        top: 0
+        ActionView:
+            ActionPrevious:
+            ActionButton:
+                text: 'Home'
+            ActionButton:
+                text: 'Add New'
