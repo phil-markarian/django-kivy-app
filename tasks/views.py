@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from .serializers import *
 from .models import *
 
-# Create your views here.
 @api_view(['GET'])
 def all_tasks(request):
     tasks = Task.objects.all()
