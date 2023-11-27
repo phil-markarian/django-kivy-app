@@ -16,5 +16,22 @@ BoxLayout:
             ActionPrevious:
             ActionButton:
                 text: 'Home'
+                on_press: root.manager.current = 'screen_home'
+
             ActionButton:
                 text: 'Add New'
+                on_press: root.manager.current = 'screen_add'
+<ScreenManagement>:
+    id: screen_manager
+    HomeScreen:
+        name: 'screen_home'
+        manager: 'screen_manager'
+    AddScreen:
+        name: 'screen_add'
+        manager: 'screen_manager'
+<HomeScreen>:
+    Label:
+        text: "Home"
+<AddScreen>:
+    Label:
+        text: "Add to list..."

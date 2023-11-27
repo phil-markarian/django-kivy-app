@@ -6,6 +6,11 @@ from kivy.uix.boxlayout import BoxLayout
 #menu
 class Menu(BoxLayout):
     pass
+#screens
+class HomeScreen(Screen):
+    pass
+class AddScreen(Screen):
+    pass
 #Screen Management
 class ScreenManagement(ScreenManager):
     pass
