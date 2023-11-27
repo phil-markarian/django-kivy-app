@@ -17,4 +17,8 @@ def create_task(request):
     data = request.data
     serializer = TaskSerializer(data=data)
     if serializer.is_valid():
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer.save()
+        tasks = Task.objects.all()  # Retrieve all tasks after creation
+        all_tasks_serializer = TaskSerializer(tasks, many=True)
+        return Response(all_tasks_serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
