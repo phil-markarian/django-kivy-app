@@ -18,5 +18,6 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', views.all_tasks, name='all_tasks'),
+    path('create', views.create_task, name='create_task')
 ]
