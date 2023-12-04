@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from .serializers import UserSerializer
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate, login
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -25,3 +27,19 @@ class UserLoginView(APIView):
         # Your login logic here
         return Response("Login logic here", status=status.HTTP_200_OK)
 
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            # Generate and return a token if using Token authentication
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
