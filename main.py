@@ -9,6 +9,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.network.urlrequest import UrlRequest
+import json
 
 class Menu(BoxLayout):
     pass
@@ -82,23 +84,43 @@ class UserRegistrationScreen(Screen):
                 # Handle the failure scenario, such as displaying an error message
 
 class LoginScreen(Screen):
-    username_input = ObjectProperty()
-    password_input = ObjectProperty()
+    def on_success(self, req, result):
+        # Handle the successful response from the API or local logic
+        print('Login successful')
+        # Add code to switch to the home screen or desired screen
+        # Example: self.manager.current = 'screen_home'
 
+    def on_failure(self, req, result):
+        # Handle the failure response from the API or local logic
+        print('Invalid username or password')
+        # Display an error message or handle accordingly
     def login_user(self):
         username = self.username_input.text
         password = self.password_input.text
 
         if username and password:
-            # Add your login logic here
-            # Check if the username and password are valid
-            # If valid, switch to the home screen or desired screen
-            # If not valid, display an error message or handle accordingly
-            # Example: self.manager.current = 'screen_home'
-            print('Login logic goes here')
+            # Replace 'your_api_url' with the actual URL of your Django API endpoint
+            api_url = 'http://127.0.0.1:8000/users/login/'
+
+            # Data to be sent to the Django API
+            data = {'username': username, 'password': password}
+
+            # Send a POST request to the Django API
+            response = requests.post(api_url, json=data)
+
+            if response.status_code == 200:
+                # Handle successful login
+                self.on_success(None, response.json())
+            elif response.status_code == 401:
+                # Handle unsuccessful login
+                self.on_failure(None, response.json())
+            else:
+                # Handle other response statuses
+                print(f'Unexpected response status: {response.status_code}')
         else:
             print('Invalid username or password')
             # Display an error message or handle accordingly
+
 
 class ScreenManagement(ScreenManager):
     pass
