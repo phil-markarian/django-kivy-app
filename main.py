@@ -16,35 +16,78 @@ from kivy.uix.label import Label
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
 import json
 
+
 class Menu(BoxLayout):
     pass
+
+
+
 
 
 
 class MyRecycleView(RecycleView):
     def __init__(self, **kwargs):
         super(MyRecycleView, self).__init__(**kwargs)
+
+        # Load data initially
         self.load_data()
 
-    def load_data(self):
-        store = requests.get('http://127.0.0.1:8000/').json()
+        # Schedule the load_data method to run every 1 second
+        Clock.schedule_interval(self.load_data, 1)
 
-        layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
-        layout.bind(minimum_height=layout.setter('height'))
+    def load_data(self, *args):
+        try:
+            app = App.get_running_app()
 
-        for item in store:
-            label = Label(text=item['name'], size_hint_y=None, height=40)
-            layout.add_widget(label)
+            # Check if the user is logged in (token is not empty)
+            if not app.token:
+                print("DEBUG: User is not logged in. Skipping data loading.")
+                return
 
-        # Set the layout as the only child of the RecycleView
-        self.data = [{'viewclass': 'MyLabel', 'label': label} for label in layout.children]
+            # Use the correct endpoint for fetching tasks
+            endpoint = 'http://127.0.0.1:8000/all_tasks/'  # Adjust the endpoint as needed
+            headers = {'Authorization': f'Token {app.token}'}
+            response = requests.get(endpoint, headers=headers)
+
+            # Check if the request was successful (status code 200)
+            if response.ok:
+                # Update the data property with the new tasks
+                tasks = response.json()
+                self.data = [{'text': item['name']} for item in tasks]
+
+              # Print tasks
+              #  print("DEBUG: Tasks:")
+              #  for task in tasks:
+              #      print(task)
+
+                #print(f"DEBUG: Successfully retrieved {len(tasks)} tasks.")
+            else:
+                print(f"DEBUG: Error loading data - {response.status_code}: {response.text}")
+
+        except Exception as e:
+            print(f"DEBUG: Error loading data - {str(e)}")
+
+
+
+
 
 class MyLabel(Label):
     pass
 
 
 class HomeScreen(Screen):
-    pass
+    def on_pre_enter(self, *args):
+        super(HomeScreen, self).on_pre_enter(*args)
+        print("DEBUG: Pre-entering HomeScreen")
+
+        # Remove existing MyRecycleView if it exists
+        if hasattr(self, 'my_recycle_view'):
+            self.remove_widget(self.my_recycle_view)
+
+        # Create a new MyRecycleView instance
+        self.my_recycle_view = MyRecycleView()
+        self.add_widget(self.my_recycle_view)
+
 
 class AddNewForm(Widget):
     text_input = ObjectProperty(None)
@@ -52,8 +95,12 @@ class AddNewForm(Widget):
 
     def submit_input(self):
         self.input = self.text_input.text
-        post = requests.post('http://127.0.0.1:8000/create', json={'name': self.input})
+        app = App.get_running_app()
+        headers = {'Content-Type': 'application/json', 'Authorization': f'Token {app.token}'}
+        post = requests.post('http://127.0.0.1:8000/create/', json={'name': self.input}, headers=headers)
+        print(post.request.method)  
         self.input = ''
+
 
 class AddScreen(Screen):
     def __init__(self, **kwargs):
@@ -87,15 +134,23 @@ class UserRegistrationScreen(Screen):
 
             if response.status_code == 201:
                 print('User registered successfully!')
-                if hasattr(self, 'manager') and isinstance(self.manager, ScreenManager):
-                    print(f'Current screen: {self.manager.current}')
-                    self.manager.current = 'screen_login'
-                    print(f'Switched to login screen. Current screen: {self.manager.current}')
+
+                # Access the app instance and its manager
+                app = App.get_running_app()
+                manager = app.root.ids.screen_manager
+
+                # Check if manager is a valid ScreenManager instance
+                if isinstance(manager, ScreenManager):
+                    # Switch to the login screen
+                    manager.current = 'screen_login'
+                    print(f'Switched to login screen. Current screen: {manager.current}')
                 else:
-                    print('No manager or invalid manager instance.')
+                    print('Invalid manager instance.')
+
             else:
                 print('Registration failed.')
                 # Handle the failure scenario, such as displaying an error message
+
 
 class LoginScreen(Screen):
     def on_success(self, req, result):
@@ -185,6 +240,7 @@ class UserProfileScreen(Screen):
 
 class ScreenManagement(ScreenManager):
     pass
+
 
 class TodoApp(App):
     token = ''  # Initialize the token as an empty string
