@@ -1,0 +1,11 @@
+# Virtual environment
+myenv/
+
+# Python cache
+tasks/__pycache__/
+TodoAPI/__pycache__/
+users/__pycache__/
+
+
+# Environment variables file
+.env
