@@ -17,6 +17,9 @@ BoxLayout:
         LoginScreen:
             name: 'screen_login'
             manager: 'screen_manager'
+        UserProfileScreen:
+            name: 'screen_profile'
+            manager: 'screen_manager'
 
 <Menu>:
     orientation: "vertical"
@@ -36,6 +39,9 @@ BoxLayout:
             ActionButton:
                 text: 'Login'
                 on_press: root.manager.current = 'screen_login'
+            ActionButton:
+                text: 'Profile'
+                on_press: root.manager.current = 'screen_profile'
 
 <ScreenManagement>:
     id: screen_manager
@@ -51,21 +57,19 @@ BoxLayout:
     LoginScreen:
         name: 'screen_login'
         manager: 'screen_manager'
+    UserProfileScreen:
+        name: 'screen_profile'
+        manager: 'screen_manager'
 
 <HomeScreen>:
-    BoxLayout:
-        orientation: "vertical"
-        MyRecycleView:
+    MyRecycleView:
 
 <MyRecycleView>:
     viewclass: 'Label'
     RecycleBoxLayout:
-        color: 1, 1, 1, 1
-        default_size: None, dp(56)
-        default_size_hint: 1, None
+        orientation: 'vertical'
         size_hint_y: None
         height: self.minimum_height
-        orientation: 'vertical'
 
 <AddNewForm>:
     text_input: input
@@ -164,3 +168,33 @@ BoxLayout:
         size: 150, 40
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}  # Center the Button horizontally
         on_release: root.register_user(self)
+
+<UserProfileScreen>:
+    username_label: username_label
+    email_label: email_label
+
+    orientation: 'vertical'
+    spacing: 10
+    padding: [20, 20]
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height  # Adjust the height of the BoxLayout
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}  # Center the BoxLayout horizontally
+
+        Label:
+            id: username_label
+            text: 'Username: '
+            size_hint_y: None
+            height: 40  # Specify the height of the Label
+
+        Label:
+            id: email_label
+            text: 'Email: '
+            size_hint_y: None
+            height: 40  # Specify the height of the Label
+
+    Button:
+        text: 'Edit Profile'
+        on_release: root.edit_profile()
