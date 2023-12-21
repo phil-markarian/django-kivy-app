@@ -56,5 +56,12 @@ class StoreItemDetail(RetrieveUpdateDestroyAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response({'error': 'UserProfile not found for the authenticated user.'}, status=status.HTTP_404_NOT_FOUND)
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'error': f'Failed to delete object. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
