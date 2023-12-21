@@ -6,6 +6,7 @@ tasks/__pycache__/
 TodoAPI/__pycache__/
 users/__pycache__/
 tasks/migrations/__pycache__
+users/migrations/__pycache__
 
 
 # Environment variables file
