@@ -41,3 +41,27 @@ The ToDo App is created for educational purposes and demonstrates the implementa
 ---
 
 Feel free to customize or add more information based on the specifics of your ToDo App!
+
+
+# Development
+
+## Create env
+
+```
+python3 -m venv myenv
+```
+
+## Activate your env
+
+On Windows:
+```
+myenv\Scripts\activate
+```
+On macOS and Linux:
+```
+source myenv/bin/activate
+```
+
+## Install the necessary dependencies
+
+pip install -r requirements.txt
