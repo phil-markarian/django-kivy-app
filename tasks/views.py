@@ -1,8 +1,10 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from .serializers import TaskSerializer
 from .serializers import StoreItemSerializer
+from users.models import UserProfile
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Task, StoreItem
@@ -36,18 +38,23 @@ class CreateTaskView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class StoreItemList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = StoreItem.objects.all()
     serializer_class = StoreItemSerializer
 
-class StoreItemDetail(generics.RetrieveUpdateDestroyAPIView):
+class StoreItemDetail(RetrieveUpdateDestroyAPIView):
     queryset = StoreItem.objects.all()
     serializer_class = StoreItemSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_update(self, serializer):
-        # Add the activated item to the user's profile
-        user = self.request.user
-        user.userprofile.activated_items.add(serializer.instance)
-        serializer.save()
+        try:
+            user_profile = UserProfile.objects.get(user=self.request.user)
+            activated_item = serializer.instance
+            user_profile.activated_items.add(activated_item)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except UserProfile.DoesNotExist:
+            return Response({'error': 'UserProfile not found for the authenticated user.'}, status=status.HTTP_404_NOT_FOUND)
 
 
